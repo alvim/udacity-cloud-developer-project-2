@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import validateUrl from 'url-validator';
+import { isUri } from 'valid-url';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
 (async () => {
@@ -16,7 +16,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   app.get("/filteredimage", async (req, res) => {
     const { image_url: imageUrl } = req.query;
-    if (!imageUrl || !validateUrl(imageUrl)) {
+    if (!imageUrl || !isUri(imageUrl)) {
       return res.status(400).send({ auth: false, message: 'Image url is missing or malformed' });
     }
 
