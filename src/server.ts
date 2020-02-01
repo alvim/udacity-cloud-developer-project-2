@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import validateUrl from 'url-validator';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
 (async () => {
@@ -13,6 +14,17 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
 
+
+  app.get("/filteredimage", async (req, res) => {
+    const { image_url: imageUrl } = req.query;
+    if (!imageUrl || !validateUrl(imageUrl)) {
+      return res.status(400).send({ auth: false, message: 'Image url is missing or malformed' });
+    }
+
+    const filteredPath = await filterImageFromURL(imageUrl);
+
+    res.sendFile(filteredPath, {}, () => deleteLocalFiles([filteredPath]));
+  });
   // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
